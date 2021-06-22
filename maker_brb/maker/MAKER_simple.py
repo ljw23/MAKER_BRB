@@ -24,13 +24,9 @@ class MAKER(nn.Module):
             for v_q in index_dict.items():
                 v, q_list = v_q
                 for q in q_list:
-                    hvq = self.get_feature_name(h,v,q)
-                    self.build_hvq(hvq)
                     
-             
-    def get_feature_name(self,indexname_list:Iterable[str])->str:
-        return '_'.join(indexname_list)
-
+                    self.build_hvq()
+    
     def build_hvq(self, indexname:str):
         if set(indexname) not in self.index_set_list:
             self.w_m_hvq[indexname] = Parameter(torch.Tensor(1))
