@@ -22,13 +22,11 @@ class Feature_info(BaseModel):
 
 class  Feature(BaseModel):
     feature_id: int
+    h: str
     feature_info: List[Feature_info]
 
-def find_feature(feature_info:List[Feature_info], feature_list:List[Feature]) -> Feature:
-    for feature in feature_list:
-        if feature_info == feature.Feature_info:
-            return feature
-
+    def __str__(self):
+        return '_'.join([str(_feature_info) for _feature_info in self.feature_info])
 
 class Feature_builder:
     def __init__(self):
@@ -48,27 +46,70 @@ class Feature_builder:
         '''
         self.feature_list:List[Feature]= []
 
-        feature_id = 0
+        
+
+        feature_info_list =[]
         for  v, q_set  in self.features.items():
-            _feature_info_list = []
+            _feature_info_list = [] #每个v
             for q in q_set:
                 feature_info = Feature_info(v=v,q=q)
                 _feature_info_list.append(feature_info) #每个v下所有的q特征
             
-            new_feature_list = []
+            new_feature_info_list = []
             for _feature_info in _feature_info_list:
-                new_feature_list.append(Feature(feature_id=feature_id, feature_info=[_feature_info])) #单独特征
-                feature_id += 1
-                for _feature in self.feature_list: #构建交叉特征
+                new_feature_info_list.append(_feature_info) #单独特征
+                for feature_info in feature_info_list: #构建交叉特征
                     new_feature_info = [_feature_info]
-                    new_feature_info.extend(_feature.feature_info)
-                    new_feature = Feature(feature_id=feature_id, feature_info=sorted(new_feature_info,key=lambda x:str(x)))
-                    new_feature_list.append(new_feature)
-                    feature_id += 1
-            self.feature_list.extend(new_feature_list)
+                    new_feature_info.extend(feature_info)      
+                    new_feature_info_list.append(new_feature_info) 
+                        
+            feature_info_list.extend(new_feature_info_list)
 
+        feature_id = 0
+        for h in self.h_set:
+            for feature_info in feature_info_list:
+                self.feature_list.append(Feature(feature_id=feature_id, h=h,feature_info=feature_info))
+                feature_id += 1
+        
+    def find_feature_id(self,h=None, feature_info:List[Feature_info]=None) -> int:
+        for feature in self.feature_list:
+            if feature_info == feature.feature_info and (not h or h==feature.h):
+                return feature.id
+    
+    def find_feature(self, feature_id:int) -> Feature:
+        for feature in self.feature_list:
+            if feature_id == feature.feature_id:
+                return feature
+    
+    @property
+    def len_feature_list(self):
+        return len(self.feature_list)
+
+    def find_v_features(self,v_list:List[str]=None,h:str=None,level:int=0):
+        '''
+        根据v特征列表以及层级查询特征
+        '''
+        if not v_list and not level:
+            return
+        if not level:
+            level = len(v_list)
+        v_features = []
+        for feature in self.feature_list:
+            if len(feature.feature_info) != level:
+                continue
+            if not v_list:
+                v_features.append(feature)
+                continue
+            v_list_in_feature = [feature_info.v for feature_info in feature.feature_info]
+            if v_list_in_feature == v_list and (not h or h==feature.h):
+                v_features.append(feature)
+        return v_features
 
 if __name__ == '__main__':
     feature_builder =  Feature_builder()
     pprint(feature_builder.feature_list)
-                
+    # pprint(feature_builder.len_feature_list)
+    # pprint(feature_builder.find_v_features(v_list=['V1','V3']))
+    # print('level:')
+    # pprint(feature_builder.find_v_features(level=2))
+    # pprint(feature_builder.find_feature_id(h=1,feature_info=[Feature_info(v='V1', q='B1'), Feature_info(v='V1', q='B1'), Feature_info(v='V2', q='C2')]))
