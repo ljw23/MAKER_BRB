@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/home/liujunwen/.cache/pypoetry/virtualenvs/maker-brb-cDHtcBba-py3.7/bin/python",
+    "python.pythonPath": "/home/liujunwen/anaconda3/bin/python",
     "python.jediEnabled": false,
     "python.languageServer": "Microsoft",
     "python.formatting.provider": "yapf"
