@@ -1,6 +1,7 @@
 # 定义一个 my_layer.py
 import torch
- 
+
+
 class MyLayer(torch.nn.Module):
     '''
     因为这个层实现的功能是：y=weights*sqrt(x2+bias),所以有两个参数：
@@ -15,13 +16,16 @@ class MyLayer(torch.nn.Module):
         super(MyLayer, self).__init__()  # 和自定义模型一样，第一句话就是调用父类的构造函数
         self.in_features = in_features
         self.out_features = out_features
-        self.weight = torch.nn.Parameter(torch.Tensor(in_features, out_features)) # 由于weights是可以训练的，所以使用Parameter来定义
+        self.weight = torch.nn.Parameter(
+            torch.Tensor(in_features,
+                         out_features))  # 由于weights是可以训练的，所以使用Parameter来定义
         if bias:
-            self.bias = torch.nn.Parameter(torch.Tensor(in_features))             # 由于bias是可以训练的，所以使用Parameter来定义
+            self.bias = torch.nn.Parameter(
+                torch.Tensor(in_features))  # 由于bias是可以训练的，所以使用Parameter来定义
         else:
             self.register_parameter('bias', None)
- 
+
     def forward(self, input):
-        input_=torch.pow(input,2)+self.bias
-        y=torch.matmul(input_,self.weight)
+        input_ = torch.pow(input, 2) + self.bias
+        y = torch.matmul(input_, self.weight)
         return y

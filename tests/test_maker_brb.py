@@ -4,8 +4,10 @@ from maker_brb.types.encoded_parameter import *
 from maker_brb.types.w_k_rules import *
 from maker_brb.types.attrbute import *
 
+
 def test_version():
     assert __version__ == '0.1.0'
+
 
 def test_types():
     pprint(build_combined_atrributes())
@@ -16,6 +18,3 @@ def test_types():
 
 if __name__ == '__main__':
     test_types()
-    
-
-   

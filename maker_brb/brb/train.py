@@ -8,22 +8,24 @@ import json
 
 
 class Trainer:
-    def __init__(self,
-                 data_file: str = 'data/demodata.txt',
-                 attribute_file: Path = Path('data/attribute.json'),
-                 label_file=Path('data/label.json'),
-                 batch_size=8,
-                 epochs=1000,
-                 learning_rate=0.0001,):
+    def __init__(
+            self,
+            data_file: str = 'data/demodata.txt',
+            attribute_file: Path = Path('data/attribute.json'),
+            label_file=Path('data/label.json'),
+            batch_size=8,
+            epochs=1000,
+            learning_rate=0.0001,
+    ):
 
         self.data_file = data_file
-        self.batch_size=batch_size
-        self.device = torch.device( 'cpu')
+        self.batch_size = batch_size
+        self.device = torch.device('cpu')
 
         self.build_attribute(attribute_file)
         self.build_labels(label_file)
         self.build_dataloader()
-        self.model =self.build_model()
+        self.model = self.build_model()
 
         self.batch_size = batch_size
         self.epochs = epochs
@@ -31,16 +33,14 @@ class Trainer:
 
     def build_dataloader(self):
         train_dataset = BrbDataset(self.data_file, self.attribute_builder)
-        self.train_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                                        batch_size=self.batch_size,
-                                                        shuffle=True)
+        self.train_loader = torch.utils.data.DataLoader(
+            dataset=train_dataset, batch_size=self.batch_size, shuffle=True)
 
-        self.test_loader = torch.utils.data.DataLoader(dataset=train_dataset,
-                                                       batch_size=self.batch_size,
-                                                       shuffle=False)
+        self.test_loader = torch.utils.data.DataLoader(
+            dataset=train_dataset, batch_size=self.batch_size, shuffle=False)
 
     def build_attribute(self, attribute_file):
-        with open(attribute_file,'r')as f:
+        with open(attribute_file, 'r') as f:
             attributes = json.load(f)
         self.attribute_builder = Attribute_builder(attributes)
 
@@ -48,7 +48,7 @@ class Trainer:
         self.num_A = self.attribute_builder.num_A
 
     def build_labels(self, label_file: Path):
-        with open(label_file,'r')as f:
+        with open(label_file, 'r') as f:
             labels = json.load(f)
         self.num_h = len(labels)
 
@@ -78,13 +78,12 @@ class Trainer:
                 optimizer.step()
                 self.model.post_mapping()
 
-
                 if (i + 1) % 1 == 0:
                     print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(
-                        epoch + 1, self.epochs, i + 1, total_step, loss.item()))
+                        epoch + 1, self.epochs, i + 1, total_step,
+                        loss.item()))
 
-                
-                if(epoch+1)%10 == 0:
+                if (epoch + 1) % 10 == 0:
                     print('')
 
 

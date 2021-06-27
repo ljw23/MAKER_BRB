@@ -4,7 +4,8 @@ from torch.nn import Parameter
 from torch.nn.init import constant
 from torch.nn import init
 from torch.nn.modules import Linear
-# from torch.functional import 
+# from torch.functional import
+
 
 class MyLayer(nn.Module):
     def __init__(self):
@@ -13,7 +14,7 @@ class MyLayer(nn.Module):
         # self.delta1 = Parameter(torch.empty(1))
         # self.alpha2 = Parameter(torch.empty(1))
         # self.delta2 = Parameter(torch.empty(1))
-        
+
         # self.reset_parameters()
 
         # self.weight1 = torch.tensor(0.6,requires_grad=True)
@@ -28,25 +29,27 @@ class MyLayer(nn.Module):
         # constant(self.weight1, 0.6)
         # constant(self.weight2, 2.0)
         # torch.nn.init.ones_(self.weight1)
-        # torch.nn.init.ones_(self.weight2)       
+        # torch.nn.init.ones_(self.weight2)
         init.uniform_(self.alpha1, 0, 1)
         # init.uniform_(self.delta1, 0, 1)
         # init.uniform_(self.alpha2, 0, 1)
-        # init.uniform_(self.delta2, 0, 1) 
+        # init.uniform_(self.delta2, 0, 1)
 
     def forward(self, x):
-        input_=torch.pow(x,2)
-        y=torch.mul(input_,self.alpha1)     
+        input_ = torch.pow(x, 2)
+        y = torch.mul(input_, self.alpha1)
         return y
+
 
 class MyNet(nn.Module):
     def __init__(self):
         super(MyNet, self).__init__()  # 第一句话，调用父类的构造函数
         self.mylayer1 = MyLayer()
-    
+
     def forward(self, x):
         x = self.mylayer1(x)
         return x
+
 
 if __name__ == '__main__':
     model = MyNet()
@@ -54,7 +57,7 @@ if __name__ == '__main__':
     learning_rate = 0.01
     input_x = torch.tensor(1)
     input_y = torch.tensor(5)
-    
+
     # len_input = len(input_x)
 
     criterion = nn.MSELoss()
@@ -67,6 +70,4 @@ if __name__ == '__main__':
         optimizer.zero_grad()
         loss.backward()
         optimizer.step()
-        print('loss:%f'%loss)
-
-
+        print('loss:%f' % loss)
