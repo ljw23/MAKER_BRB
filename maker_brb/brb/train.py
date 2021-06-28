@@ -5,6 +5,7 @@ from pathlib import Path
 from .data_preprocess import Attribute_builder
 from .brb_model import BRB_Model
 import json
+from maker_brb.utils.set_seed import  set_seed
 
 
 class Trainer:
@@ -14,9 +15,11 @@ class Trainer:
             attribute_file: Path = Path('data/attribute.json'),
             label_file=Path('data/label.json'),
             batch_size=8,
-            epochs=1000,
-            learning_rate=0.0001,
+            epochs=800,
+            learning_rate=0.001,
+            seed =100
     ):
+        set_seed(seed)
 
         self.data_file = data_file
         self.batch_size = batch_size
@@ -34,7 +37,7 @@ class Trainer:
     def build_dataloader(self):
         train_dataset = BrbDataset(self.data_file, self.attribute_builder)
         self.train_loader = torch.utils.data.DataLoader(
-            dataset=train_dataset, batch_size=self.batch_size, shuffle=True)
+            dataset=train_dataset, batch_size=self.batch_size, shuffle=False)
 
         self.test_loader = torch.utils.data.DataLoader(
             dataset=train_dataset, batch_size=self.batch_size, shuffle=False)
@@ -82,12 +85,25 @@ class Trainer:
                     print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'.format(
                         epoch + 1, self.epochs, i + 1, total_step,
                         loss.item()))
+    
+    def test(self):
+        with torch.no_grad():
+            correct = 0
+            total = 0
+            for input_x, labels in self.test_loader:
+                input_x = input_x.to(self.device)
+                labels = labels.to(self.device)
+                outputs =self.model(input_x)
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
 
-                if (epoch + 1) % 10 == 0:
-                    print('')
+            print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
+
+        # Save the model checkpoint
+        # torch.save(model.state_dict(), 'model.ckpt')
 
 
-# Device configuration
 
 # MNIST dataset
 
@@ -126,18 +142,4 @@ class Trainer:
 
 # # Test the model
 # # In test phase, we don't need to compute gradients (for memory efficiency)
-# with torch.no_grad():
-#     correct = 0
-#     total = 0
-#     for images, labels in test_loader:
-#         images = images.reshape(-1, 28*28).to(device)
-#         labels = labels.to(device)
-#         outputs = model(images)
-#         _, predicted = torch.max(outputs.data, 1)
-#         total += labels.size(0)
-#         correct += (predicted == labels).sum().item()
 
-#     print('Accuracy of the network on the 10000 test images: {} %'.format(100 * correct / total))
-
-# # Save the model checkpoint
-# torch.save(model.state_dict(), 'model.ckpt')
